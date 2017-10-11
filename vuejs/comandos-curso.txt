@@ -1,0 +1,14 @@
+
+####Rodar a api(back end)
+npm start
+
+
+####Rodar o alurapic(front end)
+npm install vue-cli@2.7.0 -g
+vue init webpack-simple
+npm install
+npm run dev
+
+
+
+
