@@ -1,47 +1,55 @@
 <template>
-    <button class="botao" :class="estiloDoBotao" :type="tipo" @click="disparaAcao()">{{rotulo}}</button>
+    <button @click="disparaAcao()" class="botao" :class="estiloDoBotao" :type="tipo">{{ rotulo }}</button>
 </template>
+
 <script>
+
 export default {
 
-   props: {
-       tipo: {
-           type: String, 
-           required: true
-       },
+    props: {
 
-       rotulo: {
-           type: String, 
-           required: true
-       },
+        tipo: {
+            required: true, 
+            type: String
+        },
 
-       confirmacao: Boolean,
-       estilo: String
-   },
-   methods: {
-       disparaAcao() {
-           if(this.confirmacao) {
-               if(confirm('Confirma operacao?')) {
+        rotulo: {
+            required: true, 
+            type: String
+        }, 
+
+        confirmacao: Boolean,
+        estilo: String
+
+    },
+
+    methods: {
+
+        disparaAcao() {
+
+            if(this.confirmacao) {
+                if(confirm('Confirma operação?')) {
                     this.$emit('botaoAtivado');
                 }
                 return;
-           }
-           this.$emit('botaoAtivado');
-       }       
-   },
-   computed: {
-       estiloDoBotao() {
+            }
+            this.$emit('botaoAtivado');
+        }
+    },
 
-           // se o valor é padrão ou não passou nada para estilo
-           if(this.estilo == 'padrao' || !this.estilo) return 'botao-padrao';
+    computed: {
 
-           if(this.estilo == 'perigo') return 'botao-perigo';
-       }
-   }
+        estiloDoBotao() {
+
+            if(this.estilo == 'padrao' || !this.estilo) return 'botao-padrao';
+            if(this.estilo == 'perigo') return 'botao-perigo';
+        }
+
+    }
 }
-</script>    
+</script>
 
-<style scoped>
+<style>
     .botao {
         display: inline-block;
         padding: 10px;
@@ -59,5 +67,4 @@ export default {
         background: darkcyan;
         color: white;
     }
-
 </style>

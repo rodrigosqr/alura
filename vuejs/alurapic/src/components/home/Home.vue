@@ -1,25 +1,28 @@
-
 <template>
   <div>
     <h1 class="centralizado">{{ titulo }}</h1>
-    <input type="search" class="filtro" v-on:input="filtro = $event.target.value" placeholder="filtre pelo título da foto">
-    {{ filtro }}
+
+    <p v-show="mensagem" class="centralizado">{{ mensagem }}</p>
+
+    <input type="search" class="filtro" @input="filtro = $event.target.value" placeholder="filtre por parte do título">
+
     <ul class="lista-fotos">
-      <li class="lista-fotos-item" v-for="foto of fotosComfiltro">
+      <li class="lista-fotos-item" v-for="foto of fotosComFiltro">
 
         <meu-painel :titulo="foto.titulo">
-            <imagem-responsiva :src="foto.url" :alt="foto.titulo"></imagem-responsiva>
-            <meu-botao 
-              tipo="button" 
-              rotulo="REMOVER" 
-              @botaoAtivado="remove(foto)" 
-              :confirmacao="true" 
-              estilo="perigo"/>
+          
+          <imagem-responsiva v-meu-transform:scale.animate="1.2" :url="foto.url" :titulo="foto.titulo"/>
+          <meu-botao 
+            tipo="button" 
+            rotulo="REMOVER" 
+            @botaoAtivado="remove(foto)"
+            :confirmacao="true"
+            estilo="perigo"/>
+          
         </meu-painel>
 
       </li>
     </ul>
-
   </div>
 </template>
 
@@ -27,43 +30,63 @@
 import Painel from '../shared/painel/Painel.vue';
 import ImagemResponsiva from '../shared/imagem-responsiva/ImagemResponsiva.vue';
 import Botao from '../shared/botao/Botao.vue';
+import FotoService from '../../domain/foto/FotoService';
 
 export default {
 
   components: {
-    'meu-painel': Painel,
+    'meu-painel' : Painel, 
     'imagem-responsiva': ImagemResponsiva,
-    'meu-botao': Botao
+    'meu-botao' : Botao
   },
+
   data() {
 
     return {
 
       titulo: 'Alurapic', 
-      fotos: [],
-      filtro: ''
+      fotos: [], 
+      filtro: '',
+      mensagem: ''
     }
   },
-   methods: {
-    remove(foto) {
-      alert(foto.titulo);
-    }
-  },
+
   computed: {
-    fotosComfiltro() {
-      
-      if (this.filtro){
+
+    fotosComFiltro() {
+
+      if(this.filtro) {
         let exp = new RegExp(this.filtro.trim(), 'i');
         return this.fotos.filter(foto => exp.test(foto.titulo));
-      }else{
+      } else {
         return this.fotos;
       }
     }
   },
+
+  methods: {
+
+    remove(foto) { 
+       
+      this.service.apaga(foto._id)
+        .then(()=> {
+          let indice = this.fotos.indexOf(foto);
+          this.fotos.splice(indice, 1);
+          this.mensagem = 'Foto removida com sucesso';
+        }, err => {
+          console.log(err);
+          this.mensagem = 'Não foi possível remover a foto';
+        });
+    }
+
+  },
+
   created() {
 
-    this.$http.get('http://localhost:3000/v1/fotos')
-      .then(res => res.json())
+    this.service = new FotoService(this.$resource);
+
+    this.service
+      .lista()
       .then(fotos => this.fotos = fotos, err => console.log(err));
   }
 }
@@ -71,6 +94,7 @@ export default {
 </script>
 
 <style>
+
   .centralizado {
 
     text-align: center;
@@ -85,8 +109,9 @@ export default {
     display: inline-block;
   }
 
-  .filtro{
+  .filtro {
+
     display: block;
-    width: 100%
+    width: 100%;
   }
 </style>
